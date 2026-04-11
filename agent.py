@@ -1,10 +1,11 @@
+import os
 import google.generativeai as genai
 from rag import search_knowledge_base
 from intent import classify_intent
 from tools import mock_lead_capture
 
 # ── CONFIG ──────────────────────────────────────────────
-API_KEY = "AIzaSyBlLWSWr8fUoI-i38cNE6LxevKMyquUvvw"
+API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
