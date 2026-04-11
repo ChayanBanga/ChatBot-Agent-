@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoStream AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            width: 420px;
+            height: 650px;
+            background: #1a1a2e;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid #2a2a4a;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #6c63ff, #3b82f6);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-info h2 {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header-info p {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #3a3a5c;
+            border-radius: 2px;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .message.agent {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #6c63ff, #3b82f6);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.agent .message-bubble {
+            background: #2a2a4a;
+            color: #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: #4a4a6a;
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+
+        .intent-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .intent-greeting { background: #1a3a2a; color: #22c55e; }
+        .intent-inquiry { background: #1a2a3a; color: #3b82f6; }
+        .intent-high_intent { background: #3a1a2a; color: #f59e0b; }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: #2a2a4a;
+            padding: 12px 16px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #6c63ff;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.2s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .chat-input-area {
+            padding: 16px 20px;
+            background: #1a1a2e;
+            border-top: 1px solid #2a2a4a;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #2a2a4a;
+            border: 1px solid #3a3a5c;
+            border-radius: 25px;
+            padding: 12px 18px;
+            color: #e2e8f0;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #6c63ff;
+        }
+
+        .chat-input::placeholder {
+            color: #4a4a6a;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6c63ff, #3b82f6);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .send-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .lead-captured-banner {
+            background: linear-gradient(135deg, #065f46, #047857);
+            color: white;
+            padding: 10px 16px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #4a4a6a;
+            font-size: 13px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="avatar">🎬</div>
+            <div class="header-info">
+                <h2>AutoStream Assistant</h2>
+                <p><span class="status-dot"></span>Online · Powered by Inflx</p>
+            </div>
+        </div>
+
+        <div class="lead-captured-banner" id="leadBanner">
+            ✅ Lead captured successfully!
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">Ask me about pricing, features, or sign up!</div>
+            <div class="message agent">
+                <div class="message-bubble">
+                    👋 Hi! I'm AutoStream's AI assistant. I can help you with pricing, features, and getting started. What would you like to know?
+                </div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span><span></span><span></span>
+        </div>
+
+        <div class="chat-input-area">
+            <input
+                type="text"
+                class="chat-input"
+                id="chatInput"
+                placeholder="Type a message..."
+                autocomplete="off"
+            />
+            <button class="send-btn" id="sendBtn">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const leadBanner = document.getElementById('leadBanner');
+
+        const sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+
+        function getTime() {
+            return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function addMessage(text, sender, intent = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+
+            const bubble = document.createElement('div');
+            bubble.classList.add('message-bubble');
+            bubble.innerText = text;
+
+            const time = document.createElement('div');
+            time.classList.add('message-time');
+            time.innerText = getTime();
+
+            messageDiv.appendChild(bubble);
+            messageDiv.appendChild(time);
+
+            if (intent && sender === 'user') {
+                const badge = document.createElement('div');
+                badge.classList.add('intent-badge', `intent-${intent}`);
+                badge.innerText = intent.replace('_', ' ');
+                messageDiv.appendChild(badge);
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            chatInput.value = '';
+            sendBtn.disabled = true;
+            showTyping();
+
+            try {
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, session_id: sessionId })
+                });
+
+                const data = await res.json();
+                hideTyping();
+
+                // Update intent badge on last user message
+                const userMessages = chatMessages.querySelectorAll('.message.user');
+                const lastUser = userMessages[userMessages.length - 1];
+                if (lastUser && data.intent) {
+                    const existingBadge = lastUser.querySelector('.intent-badge');
+                    if (!existingBadge) {
+                        const badge = document.createElement('div');
+                        badge.classList.add('intent-badge', `intent-${data.intent}`);
+                        badge.innerText = data.intent.replace('_', ' ');
+                        lastUser.appendChild(badge);
+                    }
+                }
+
+                addMessage(data.response, 'agent');
+
+                if (data.lead_captured) {
+                    leadBanner.style.display = 'block';
+                }
+
+            } catch (err) {
+                hideTyping();
+                addMessage('Sorry, something went wrong. Please try again.', 'agent');
+            }
+
+            sendBtn.disabled = false;
+            chatInput.focus();
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
