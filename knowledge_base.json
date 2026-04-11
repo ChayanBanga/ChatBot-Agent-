@@ -1,0 +1,30 @@
+{
+  "pricing": {
+    "basic_plan": {
+      "name": "Basic Plan",
+      "price": "$29/month",
+      "videos_per_month": 10,
+      "resolution": "720p",
+      "ai_captions": false,
+      "support": "Standard support"
+    },
+    "pro_plan": {
+      "name": "Pro Plan",
+      "price": "$79/month",
+      "videos_per_month": "Unlimited",
+      "resolution": "4K",
+      "ai_captions": true,
+      "support": "24/7 support"
+    }
+  },
+  "policies": {
+    "refund_policy": "No refunds after 7 days of purchase.",
+    "support_policy": "24/7 support is available only on the Pro plan.",
+    "free_trial": "No free trial currently available."
+  },
+  "company": {
+    "name": "AutoStream",
+    "description": "AutoStream provides automated video editing tools for content creators.",
+    "target_users": "YouTubers, Instagram creators, TikTok creators, and other content creators."
+  }
+}
