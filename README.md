@@ -8,8 +8,8 @@ Built as part of the ServiceHive Inflx internship assignment.
 ## How to Run Locally
 
 1. Clone the repository
-   git clone https://github.com/YOUR_USERNAME/ChatBot-Agent-.git
-   cd YOUR_REPO_NAME
+   git clone https://github.com/ChayanBanga/ChatBot-Agent-.git
+   cd ChatBot-Agent
 
 2. Create a virtual environment
    python -m venv venv
